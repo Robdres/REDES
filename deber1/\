@@ -1,0 +1,165 @@
+\documentclass{assignment}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{listings}
+\usepackage{assignment}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+
+\newcommand*{\name}{Roberto Alvarado}
+\newcommand*{\id}{00206411}
+\newcommand*{\course}{Computer Networks}
+\newcommand*{\assignment}{Homework 1}
+
+
+\begin{document}
+
+\assignmentTitle{\name}{\id}{logo.png}{\course}{\assignment}
+\begin{ex}
+Calculate the total time required to transfer a 1000-KB file in the following
+cases, assuming an RTT of 100 ms, a packet size of 1 KB data, and an initial
+2 x RTT of “handshaking” before data is sent:
+\begin{enumerate}
+  \item The bandwidth is 1.5 Mbps, and data packets can be sent continuously.
+  \item The bandwidth is 1.5 Mbps, but after we finish sending each data packet we must wait one RTT 
+before sending the next.
+  \item The bandwidth is “infinite,” meaning that we take transmit time to be zero, and up to 20 packets can 
+be sent per RTT.
+  \item The bandwidth is infinite, and during the first RTT we can send one packet, during the second RTT 
+we can send two packets, during the third we can send four, and so on. 
+\end{enumerate}
+\end{ex}
+\textit{ Sol. }
+\begin{enumerate}
+  \item First, as there is a handshaking before sending then we have that the
+    time that takes is (we work with second as the bandwidth is in Mbps)
+    $$0.1s * 2 = 0.2s$$
+    Now we want to transmit with a bandwidth of $1500Kbps$ then as it is
+    continous we can work as a whole $1000KB$ packet, so to trasmit one packet
+    then the size of bits we want to trasmit is
+    $$1024*8bits*1000KB = 8192000bits$$
+    So to trasmit all the packages we have to work with a bandwidth of
+    $1500000bps$ so
+    $$8192000bits / 1500000bps = 5.461s$$
+    We are just missing the last RTT of response that is half of our RTT
+    so in total
+    $$time = 5.461s + 0.2s + 0.05s = 5.711s$$
+  \item We can use previous data, we have that one packet has 1KB thus the time
+    it takes to trasmit one packet
+    $$8192bits / 1500000bps = 0.005461s$$
+    So after each packet we have to add 1RTT to each time thus
+    $$0.005461s + 0.1s = 0.105461$$
+    Now we have to notice that the first package it will not wait for anything
+    apart for the first handshaking
+    $$time = 0.2s + 0.005461s + 999*(0.105461) + 0.05$$
+    $$time = 105.611s$$
+  \item As the bandwidth is infinite then first the time to transmit each packet
+    is $0s$ then we have that the time to trasmit 20 packets is
+    $$1RTT = 0.1s$$
+    Finally as we have 1000 packets, there is going to be 50 of this processes,
+    except the first one as we already have the handshaking as a preparation
+    $$time = 0.2s + 0.1*50 - 0.1 + 0.05$$
+    $$time =  5.15s$$
+  \item First we are going to know how many RTT are going to be necessary, anf
+    as for n- RTT the number of pack is going to $2^{n-1}$, we are going to see that
+    after n RTT we are going to have 
+    $$numPacket=sum_i=1^n 2^{i} = 2^{n+1} - 1$$
+    thus for 1000 packets we are going to need 
+    $$2^n -1 = 1000$$
+    We now that for n = 8, the number of packets is 512, and for n = 9 there
+    are going to be 1024, thus n=9 is the number of RTT that takes to trasmit
+    all packets, thus
+    $$time = 0.2s + 0.1s*9 + 0.05s$$
+    $$time = 1.15s$$
+\end{enumerate}
+
+\newpage
+\begin{ex}
+  One property of addresses is that they are unique; if two nodes had the same address it would be 
+  impossible to distinguish between them. What other properties might be useful for network addresses to 
+  have? Can you think of any situations in which network addresses might not be unique?
+  3.
+\end{ex}
+\textit{ Sol. }
+\begin{itemize}
+  \item Another property that could be useful to be more aware of addresses
+    could be a bit that indicates if it belongs to only one device or tu
+    multiple, in the case where a group of devices have the same address is most
+    of the times because it is intended that way, so to have the info that it
+    belongs to one or multiple devices could be usefull. 
+    Another thing that the address could have is a way to know if the device is
+    intended to manage paralelism of a single thread between similar devices.
+
+    Answering the next question, for example a case where many devices may have
+    the same address could be in a group of computers that are intented to work
+    as a server, at the end it is not necessary to differentiate between
+    the devices from the perspective of the network. In this case, to if the
+    address could give a hint if this server runs in parallel or in a single
+    thread could be very usefull.
+\end{itemize}
+
+\newpage
+\begin{ex}For each of the following operations on a remote file server, discuss whether they are more likely to be 
+delay sensitive or bandwidth sensitive:
+\begin{enumerate}
+  \item Open a file
+  \item Read the contents of a file
+  \item List the contents of a directory
+  \item Display the attributes of a file
+\end{enumerate}
+\end{ex}
+\textit{ Sol. }
+
+Just so I do not repeat myself over and over again, bandwidth sensitive will be
+understood as processes that require a lot of data to trasmit, as in the end the
+bandwidth will be the principal factor of fast trasmition, and delay sensitive
+will be processes that will be affected principally by Propagation and Queue
+times, as Delay or latency has a formula 
+$$Latency = Propagation + Transmit + Queue$$
+\begin{enumerate}
+  \item Delay sensitive, as the operation of opening a file does not require to
+    read the file itself, only to send the operation of opening a file
+  \item Bandwidth sensitive, as the files in relative terms manage big quantities
+    of data and that trasmition manages a lot of data
+  \item Delay sensitive, the directory relative to a file not be as big as other
+    things
+  \item Delay sensitive, no to much data is required to be trasmited as in the
+    mayority of cases systems have the files specifications
+\end{enumerate}
+
+\newpage
+\begin{ex}
+  Suppose that a certain communications protocol involves a per-packet overhead of 100 bytes for 
+headers. We send 1 million bytes of data using this protocol; however, when one data byte is corrupted, 
+the entire packet containing it is lost. Give the total number of overhead + loss bytes for packet data 
+sizes of 1000, 5000, 10000, and 20000 bytes. Which of these sizes is optimal?
+\end{ex}
+\textit{ Sol. }
+
+First we have $1000000B$  and the number of packets will depend on the size,
+lets start with 1000, then 
+$$number_packages = 1000000B/1000_{B/p} = 1000p $$
+Now for each packet we are going to have $100B$ for each headers for each packet
+thus the number of bytes in total only on headers is going to be
+$$overhead = 1000p * 100B/p = 100000B$$
+Thus we have the result of
+$$ result_{1000} = overhead  + total =  100000B + 1000B = 101000B$$
+Now with python
+\begin{lstlisting}[language=Python]
+
+def number(n):
+    return 100*(1000000/n) + n
+number(1000)  # 101000.0
+number(5000)  # 25000.0
+number(10000) # 20000.0
+number(20000) # 25000.0
+\end{lstlisting}
+Thus optimal is at 10000, this value is truly a minimal as
+$$f(n) =  \frac{1x10^8}{n} + n $$
+$$f'(n) =  -\frac{1x10^8}{n^2} + 1 = 0 $$
+$$ n  = 1x10$$
+
+\end{document}
